@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elite Events & Tent House</title>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+header {
+  background: #111;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.hero {
+  background: #222;
+  color: white;
+  padding: 100px 20px;
+  text-align: center;
+}
+
+section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.gallery img {
+  width: 250px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+.card {
+  background: white;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+button {
+  background: #111;
+  color: white;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:hover {
+  background: #444;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Elite Events & Tent House</h1>
+</header>
+
+<div class="hero">
+  <h2>Luxury Wedding & Event Management</h2>
+  <p>Making Your Moments Grand & Memorable</p>
+</div>
+
+<section>
+  <h2>Gallery</h2>
+  <div class="gallery">
+    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622">
+    <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486">
+    <img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde">
+  </div>
+</section>
+
+<section>
+  <h2>Price Calculator</h2>
+  <div class="card">
+    <select id="eventType">
+      <option value="50000">Wedding - ₹50,000</option>
+      <option value="20000">Birthday - ₹20,000</option>
+      <option value="30000">Corporate - ₹30,000</option>
+    </select>
+
+    <input type="number" id="guests" placeholder="Number of Guests">
+
+    <button onclick="calculate()">Calculate Price</button>
+    <p id="total"></p>
+  </div>
+</section>
+
+<section>
+  <h2>Book Your Event</h2>
+  <div class="card">
+    <input type="text" id="name" placeholder="Your Name" required>
+    <input type="tel" id="phone" placeholder="Phone Number" required>
+    <input type="date" id="date" required>
+
+    <button onclick="payNow()">Proceed to Payment</button>
+  </div>
+</section>
+
+<script>
+function calculate() {
+  const base = parseInt(document.getElementById("eventType").value);
+  const guests = parseInt(document.getElementById("guests").value) || 0;
+  const total = base + (guests * 500);
+  document.getElementById("total").innerText = "Estimated Price: ₹" + total;
+}
+
+async function payNow() {
+
+  const amount = document.getElementById("eventType").value;
+
+  const response = await fetch("/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount })
+  });
+
+  const order = await response.json();
+
+  const options = {
+    key: "rzp_test_xxxxxxxxxx", // replace with your Razorpay key
+    amount: order.amount,
+    currency: "INR",
+    order_id: order.id,
+    handler: async function () {
+
+      await fetch("/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          date: document.getElementById("date").value,
+          event: document.getElementById("eventType").options[
+            document.getElementById("eventType").selectedIndex
+          ].text
+        })
+      });
+
+      alert("Booking Successful! 🎉");
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
+</script>
+
+</body>
+</html>
