@@ -28,10 +28,11 @@ const transporter = nodemailer.createTransport({
 
 /* ================= WHATSAPP SETUP (TWILIO) ================= */
 
-const client = twilio(
-  "YOUR_TWILIO_ACCOUNT_SID",
-  "YOUR_TWILIO_AUTH_TOKEN"
-);
+// const client = twilio(
+//   "YOUR_TWILIO_ACCOUNT_SID",
+//   "YOUR_TWILIO_AUTH_TOKEN"
+// );
+
 
 /* ================= SAVE BOOKING + SEND NOTIFICATIONS ================= */
 
@@ -61,16 +62,16 @@ Event: ${booking.event}
     `
   });
 
-  /* ===== SEND WHATSAPP MESSAGE ===== */
-  await client.messages.create({
-    body: `New Booking 🎉
-Name: ${booking.name}
-Phone: ${booking.phone}
-Date: ${booking.date}
-Event: ${booking.event}`,
-    from: "whatsapp:+14155238886", // Twilio sandbox number
-    to: "whatsapp:+91YOURNUMBER"
-  });
+/* ===== SEND WHATSAPP MESSAGE DISABLED FOR NOW ===== */
+// await client.messages.create({
+//   body: `New Booking 🎉
+// Name: ${booking.name}
+// Phone: ${booking.phone}
+// Date: ${booking.date}
+// Event: ${booking.event}`,
+//   from: "whatsapp:+14155238886",
+//   to: "whatsapp:+91YOURNUMBER"
+// });
 
   res.json({ status: "Booking saved, Email & WhatsApp sent!" });
 });
